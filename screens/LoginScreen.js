@@ -59,8 +59,8 @@ export default function LoginScreen({ navigation }) {
     const newUsers = [...users, newUser];
     saveUsers(newUsers);
     Alert.alert("Sucesso", "Cadastro realizado! Agora faça login.");
-    setMatricula("");
-    setSenha("");
+    setMatricula("oi");
+    setSenha("oi");
     setModo("aluno");
   };
 
