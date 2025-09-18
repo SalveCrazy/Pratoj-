@@ -11,7 +11,7 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function LoginScreen({ navigation }) {
-  const [modo, setModo] = useState("aluno"); // aluno, admin ou cadastro
+  const [modo, setModo] = useState("aluno"); 
   const [matricula, setMatricula] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
@@ -20,7 +20,7 @@ export default function LoginScreen({ navigation }) {
   // 🔑 Admin fixo
   const admin = { email: "admin@escola.com", senha: "1234" };
 
-  // Carregar usuários do AsyncStorage
+  
   useEffect(() => {
     const loadUsers = async () => {
       try {
@@ -44,7 +44,7 @@ export default function LoginScreen({ navigation }) {
     }
   };
 
-  // Cadastro de aluno
+ 
   const handleRegister = () => {
     if (!matricula || !senha) {
       Alert.alert("Erro", "Preencha todos os campos!");
@@ -64,7 +64,7 @@ export default function LoginScreen({ navigation }) {
     setModo("aluno");
   };
 
-  // Login
+  
   const handleLogin = () => {
     if (modo === "admin") {
       if (!email || !senha) {
@@ -100,19 +100,19 @@ export default function LoginScreen({ navigation }) {
             style={[styles.toggleButton, modo === "aluno" && styles.toggleActive]}
             onPress={() => setModo("aluno")}
           >
-            <Text style={styles.toggleText}>Aluno</Text>
+            <Text style={[styles.toggleText, modo === "aluno" && styles.toggleTextActive]}>Aluno</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.toggleButton, modo === "admin" && styles.toggleActive]}
             onPress={() => setModo("admin")}
           >
-            <Text style={styles.toggleText}>Admin</Text>
+            <Text style={[styles.toggleText, modo === "admin" && styles.toggleTextActive]}>Admin</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.toggleButton, modo === "cadastro" && styles.toggleActive]}
             onPress={() => setModo("cadastro")}
           >
-            <Text style={styles.toggleText}>Cadastro</Text>
+            <Text style={[styles.toggleText, modo === "cadastro" && styles.toggleTextActive]}>Cadastro</Text>
           </TouchableOpacity>
         </View>
 
@@ -121,6 +121,7 @@ export default function LoginScreen({ navigation }) {
             <TextInput
               style={styles.input}
               placeholder="E-mail do Admin"
+              placeholderTextColor="#d1c4e9"
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
@@ -128,6 +129,7 @@ export default function LoginScreen({ navigation }) {
             <TextInput
               style={styles.input}
               placeholder="Senha"
+              placeholderTextColor="#d1c4e9"
               secureTextEntry
               value={senha}
               onChangeText={setSenha}
@@ -141,6 +143,7 @@ export default function LoginScreen({ navigation }) {
             <TextInput
               style={styles.input}
               placeholder="Matrícula (ex: 123456)"
+              placeholderTextColor="#d1c4e9"
               value={matricula}
               onChangeText={setMatricula}
               keyboardType="numeric"
@@ -148,11 +151,12 @@ export default function LoginScreen({ navigation }) {
             <TextInput
               style={styles.input}
               placeholder="Senha"
+              placeholderTextColor="#d1c4e9"
               secureTextEntry
               value={senha}
               onChangeText={setSenha}
             />
-            <TouchableOpacity style={[styles.button, { backgroundColor: "#28a745" }]} onPress={handleRegister}>
+            <TouchableOpacity style={[styles.button, { backgroundColor: "#7cb342" }]} onPress={handleRegister}>
               <Text style={styles.buttonText}>Cadastrar</Text>
             </TouchableOpacity>
           </>
@@ -161,6 +165,7 @@ export default function LoginScreen({ navigation }) {
             <TextInput
               style={styles.input}
               placeholder="Matrícula (ex: 123456)"
+              placeholderTextColor="#d1c4e9"
               value={matricula}
               onChangeText={setMatricula}
               keyboardType="numeric"
@@ -168,6 +173,7 @@ export default function LoginScreen({ navigation }) {
             <TextInput
               style={styles.input}
               placeholder="Senha"
+              placeholderTextColor="#d1c4e9"
               secureTextEntry
               value={senha}
               onChangeText={setSenha}
@@ -187,60 +193,70 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: "center",
     padding: 20,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#4a148c", 
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: "bold",
     textAlign: "center",
-    marginBottom: 20,
-    color: "#333",
+    marginBottom: 25,
+    color: "#ede7f6", 
   },
   box: {
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    padding: 15,
+    backgroundColor: "#6a1b9a", 
+    borderRadius: 12,
+    padding: 20,
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.4,
+    shadowRadius: 4,
+    elevation: 5,
   },
   toggleContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 20,
+    marginBottom: 25,
     width: "100%",
   },
   toggleButton: {
     flex: 1,
-    padding: 10,
-    backgroundColor: "#e0e0e0",
+    paddingVertical: 10,
+    backgroundColor: "#7b1fa2", 
     borderRadius: 5,
     marginHorizontal: 5,
     alignItems: "center",
   },
   toggleActive: {
-    backgroundColor: "#007AFF",
+    backgroundColor: "#ce93d8", 
   },
   toggleText: {
-    color: "#333",
+    color: "#d1c4e9",
     fontWeight: "bold",
+    fontSize: 14,
+  },
+  toggleTextActive: {
+    color: "#4a148c",
   },
   input: {
     width: "100%",
     borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 15,
-    backgroundColor: "#fff",
+    borderColor: "#ba68c8", 
+    borderRadius: 6,
+    padding: 12,
+    marginBottom: 20,
+    backgroundColor: "#7b1fa2", 
+    color: "#ede7f6", 
   },
   button: {
-    backgroundColor: "#007AFF",
-    padding: 12,
-    borderRadius: 5,
+    backgroundColor: "#ab47bc", 
+    padding: 15,
+    borderRadius: 6,
     width: "100%",
     alignItems: "center",
   },
   buttonText: {
-    color: "#fff",
+    color: "#ede7f6",
     fontSize: 16,
     fontWeight: "bold",
   },
