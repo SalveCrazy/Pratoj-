@@ -1,4 +1,3 @@
-// screens/LoginScreen.js
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -12,10 +11,10 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function LoginScreen({ navigation }) {
-  const [emailLogin, setEmailLogin] = useState("");
-  const [senhaLogin, setSenhaLogin] = useState("");
-  const [emailRegister, setEmailRegister] = useState("");
-  const [senhaRegister, setSenhaRegister] = useState("");
+  const [modo, setModo] = useState("aluno"); // aluno, admin ou cadastro
+  const [matricula, setMatricula] = useState("");
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
   const [users, setUsers] = useState([]);
 
   // 🔑 Admin fixo
@@ -24,54 +23,70 @@ export default function LoginScreen({ navigation }) {
   // Carregar usuários do AsyncStorage
   useEffect(() => {
     const loadUsers = async () => {
-      const storedUsers = await AsyncStorage.getItem("users");
-      if (storedUsers) {
-        setUsers(JSON.parse(storedUsers));
+      try {
+        const storedUsers = await AsyncStorage.getItem("users");
+        if (storedUsers) {
+          setUsers(JSON.parse(storedUsers));
+        }
+      } catch (error) {
+        Alert.alert("Erro", "Falha ao carregar usuários!");
       }
     };
     loadUsers();
   }, []);
 
   const saveUsers = async (newUsers) => {
-    setUsers(newUsers);
-    await AsyncStorage.setItem("users", JSON.stringify(newUsers));
+    try {
+      setUsers(newUsers);
+      await AsyncStorage.setItem("users", JSON.stringify(newUsers));
+    } catch (error) {
+      Alert.alert("Erro", "Falha ao salvar usuário!");
+    }
   };
 
-  // Cadastro
+  // Cadastro de aluno
   const handleRegister = () => {
-    if (!emailRegister || !senhaRegister) {
+    if (!matricula || !senha) {
       Alert.alert("Erro", "Preencha todos os campos!");
       return;
     }
-    const exists = users.find((u) => u.email === emailRegister);
+    const exists = users.find((u) => u.matricula === matricula);
     if (exists) {
-      Alert.alert("Erro", "Usuário já cadastrado!");
+      Alert.alert("Erro", "Matrícula já cadastrada!");
       return;
     }
-    const newUser = { email: emailRegister, senha: senhaRegister };
+    const newUser = { matricula, senha };
     const newUsers = [...users, newUser];
     saveUsers(newUsers);
     Alert.alert("Sucesso", "Cadastro realizado! Agora faça login.");
-    setEmailRegister("");
-    setSenhaRegister("");
+    setMatricula("");
+    setSenha("");
+    setModo("aluno");
   };
 
   // Login
   const handleLogin = () => {
-    // Se for admin
-    if (emailLogin === admin.email && senhaLogin === admin.senha) {
-      navigation.replace("HomeAdm");
-      return;
-    }
-
-    // Senão, procura aluno no AsyncStorage
-    const user = users.find(
-      (u) => u.email === emailLogin && u.senha === senhaLogin
-    );
-    if (user) {
-      navigation.replace("HomeAluno", { aluno: { email: emailLogin } });
+    if (modo === "admin") {
+      if (!email || !senha) {
+        Alert.alert("Erro", "Preencha todos os campos!");
+        return;
+      }
+      if (email === admin.email && senha === admin.senha) {
+        navigation.replace("HomeAdm");
+      } else {
+        Alert.alert("Erro", "E-mail ou senha do admin inválidos!");
+      }
     } else {
-      Alert.alert("Erro", "E-mail ou senha inválidos!");
+      if (!matricula || !senha) {
+        Alert.alert("Erro", "Preencha todos os campos!");
+        return;
+      }
+      const user = users.find((u) => u.matricula === matricula && u.senha === senha);
+      if (user) {
+        navigation.replace("HomeAluno", { aluno: { matricula } });
+      } else {
+        Alert.alert("Erro", "Matrícula ou senha inválidos!");
+      }
     }
   };
 
@@ -79,46 +94,89 @@ export default function LoginScreen({ navigation }) {
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>🎟️ Ticket Refeição</Text>
 
-      {/* LOGIN */}
       <View style={styles.box}>
-        <Text style={styles.sectionTitle}>Login</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="E-mail"
-          value={emailLogin}
-          onChangeText={setEmailLogin}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Senha"
-          secureTextEntry
-          value={senhaLogin}
-          onChangeText={setSenhaLogin}
-        />
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Entrar</Text>
-        </TouchableOpacity>
-      </View>
+        <View style={styles.toggleContainer}>
+          <TouchableOpacity
+            style={[styles.toggleButton, modo === "aluno" && styles.toggleActive]}
+            onPress={() => setModo("aluno")}
+          >
+            <Text style={styles.toggleText}>Aluno</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.toggleButton, modo === "admin" && styles.toggleActive]}
+            onPress={() => setModo("admin")}
+          >
+            <Text style={styles.toggleText}>Admin</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.toggleButton, modo === "cadastro" && styles.toggleActive]}
+            onPress={() => setModo("cadastro")}
+          >
+            <Text style={styles.toggleText}>Cadastro</Text>
+          </TouchableOpacity>
+        </View>
 
-      {/* CADASTRO */}
-      <View style={styles.box}>
-        <Text style={styles.sectionTitle}>Cadastrar novo aluno</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="E-mail"
-          value={emailRegister}
-          onChangeText={setEmailRegister}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Senha"
-          secureTextEntry
-          value={senhaRegister}
-          onChangeText={setSenhaRegister}
-        />
-        <TouchableOpacity style={[styles.button, { backgroundColor: "#28a745" }]} onPress={handleRegister}>
-          <Text style={styles.buttonText}>Cadastrar</Text>
-        </TouchableOpacity>
+        {modo === "admin" ? (
+          <>
+            <TextInput
+              style={styles.input}
+              placeholder="E-mail do Admin"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Senha"
+              secureTextEntry
+              value={senha}
+              onChangeText={setSenha}
+            />
+            <TouchableOpacity style={styles.button} onPress={handleLogin}>
+              <Text style={styles.buttonText}>Entrar como Admin</Text>
+            </TouchableOpacity>
+          </>
+        ) : modo === "cadastro" ? (
+          <>
+            <TextInput
+              style={styles.input}
+              placeholder="Matrícula (ex: 123456)"
+              value={matricula}
+              onChangeText={setMatricula}
+              keyboardType="numeric"
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Senha"
+              secureTextEntry
+              value={senha}
+              onChangeText={setSenha}
+            />
+            <TouchableOpacity style={[styles.button, { backgroundColor: "#28a745" }]} onPress={handleRegister}>
+              <Text style={styles.buttonText}>Cadastrar</Text>
+            </TouchableOpacity>
+          </>
+        ) : (
+          <>
+            <TextInput
+              style={styles.input}
+              placeholder="Matrícula (ex: 123456)"
+              value={matricula}
+              onChangeText={setMatricula}
+              keyboardType="numeric"
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Senha"
+              secureTextEntry
+              value={senha}
+              onChangeText={setSenha}
+            />
+            <TouchableOpacity style={styles.button} onPress={handleLogin}>
+              <Text style={styles.buttonText}>Entrar como Aluno</Text>
+            </TouchableOpacity>
+          </>
+        )}
       </View>
     </ScrollView>
   );
@@ -129,48 +187,61 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: "center",
     padding: 20,
-    backgroundColor: "#6a1b9a",
+    backgroundColor: "#f0f0f0",
   },
   title: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 20,
-    color: "#fff",
+    color: "#333",
   },
   box: {
     backgroundColor: "#fff",
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 20,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 4,
+    borderRadius: 10,
+    padding: 15,
+    alignItems: "center",
   },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 15,
+  toggleContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 20,
+    width: "100%",
+  },
+  toggleButton: {
+    flex: 1,
+    padding: 10,
+    backgroundColor: "#e0e0e0",
+    borderRadius: 5,
+    marginHorizontal: 5,
+    alignItems: "center",
+  },
+  toggleActive: {
+    backgroundColor: "#007AFF",
+  },
+  toggleText: {
     color: "#333",
+    fontWeight: "bold",
   },
   input: {
+    width: "100%",
     borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
+    borderColor: "#ddd",
+    borderRadius: 5,
     padding: 10,
-    marginBottom: 10,
-    backgroundColor: "#f9f9f9",
+    marginBottom: 15,
+    backgroundColor: "#fff",
   },
   button: {
     backgroundColor: "#007AFF",
     padding: 12,
-    borderRadius: 8,
+    borderRadius: 5,
+    width: "100%",
+    alignItems: "center",
   },
   buttonText: {
     color: "#fff",
     fontSize: 16,
-    textAlign: "center",
     fontWeight: "bold",
   },
 });

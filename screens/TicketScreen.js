@@ -58,6 +58,7 @@ export default function TicketScreen() {
     const today = new Date().toDateString();
     await AsyncStorage.setItem("lastTicket", today);
     setTicketAvailable(true);
+    alert("Ticket recebido com sucesso!");
   };
 
   return (
