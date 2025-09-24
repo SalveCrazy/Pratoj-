@@ -18,6 +18,7 @@ export default function LoginScreen({ navigation }) {
     } else {
       // Login do aluno
       if (matricula.trim() !== "") {
+      if (senha === "3212") {
         Alert.alert("Sucesso", `Bem-vindo aluno ${matricula}`);
         navigation.navigate("AlunoHome"); // Tela do Aluno
       } else {
