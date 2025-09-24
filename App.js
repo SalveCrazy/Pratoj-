@@ -1,11 +1,13 @@
 // App.js
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+
 import LoginScreen from "./screens/LoginScreen";  
 import TicketScreen from "./screens/TicketScreen";
+import HomeAluno from "./screens/HomeAluno";
 
-const Stack = createStackNavigator();
+const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
@@ -14,9 +16,20 @@ export default function App() {
         <Stack.Screen
           name="Login"
           component={LoginScreen}
-          options={{ headerShown: false }} // sem header
+          options={{ headerShown: false }}
         />
-        <Stack.Screen name="Ticket" component={TicketScreen} />
+
+        <Stack.Screen
+          name="AlunoHome"
+          component={HomeAluno}
+          options={{ title: "Home do Aluno" }}
+        />
+
+        <Stack.Screen
+          name="Ticket"
+          component={TicketScreen}
+          options={{ title: "Receber Ticket" }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

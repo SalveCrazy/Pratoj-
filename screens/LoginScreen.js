@@ -5,6 +5,7 @@ export default function LoginScreen({ navigation }) {
   const [matricula, setMatricula] = useState("");
   const [senha, setSenha] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
+  const [logado, setLogado] = useState(false); // novo estado para controlar login
 
   const handleLogin = () => {
     if (isAdmin) {
