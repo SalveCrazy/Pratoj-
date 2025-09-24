@@ -9,7 +9,6 @@ export default function LoginScreen({ navigation }) {
 
   const handleLogin = () => {
     if (isAdmin) {
-      // Login do administrador
       if (senha === "1234") {
         Alert.alert("Sucesso", "Bem-vindo, Administrador!");
         setLogado(true); // usuário logado
@@ -17,11 +16,8 @@ export default function LoginScreen({ navigation }) {
         Alert.alert("Erro", "Senha incorreta!");
       }
     } else {
-      // Login do aluno
       if (matricula.trim() !== "") {
-      if (senha === "3212") {
         Alert.alert("Sucesso", `Bem-vindo aluno ${matricula}`);
-        navigation.navigate("AlunoHome"); // Tela do Aluno
         setLogado(true); // usuário logado
       } else {
         Alert.alert("Erro", "Digite sua matrícula!");
@@ -59,46 +55,25 @@ export default function LoginScreen({ navigation }) {
           {isAdmin ? "Entrar como Aluno" : "Entrar como Administrador"}
         </Text>
       </TouchableOpacity>
+
+      {/* Botão só aparece se o usuário estiver logado */}
+      {logado && (
+        <TouchableOpacity
+          style={[styles.button, { marginTop: 20, backgroundColor: "#7b1fa2" }]}
+          onPress={() => navigation.navigate("Ticket")}
+        >
+          <Text style={styles.buttonText}>Ir para Receber Ticket</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    padding: 20,
-    backgroundColor: "#f5f5f5",
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 20,
-  },
-  input: {
-    backgroundColor: "#fff",
-    padding: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    marginBottom: 12,
-  },
-  button: {
-    backgroundColor: "#4CAF50",
-    padding: 15,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-  toggle: {
-    marginTop: 15,
-    textAlign: "center",
-    color: "#007BFF",
-    fontWeight: "600",
-  },
+  container: { flex: 1, justifyContent: "center", padding: 20, backgroundColor: "#f5f5f5" },
+  title: { fontSize: 26, fontWeight: "bold", textAlign: "center", marginBottom: 20 },
+  input: { backgroundColor: "#fff", padding: 12, borderRadius: 8, borderWidth: 1, borderColor: "#ccc", marginBottom: 12 },
+  button: { backgroundColor: "#4CAF50", padding: 15, borderRadius: 8, alignItems: "center" },
+  buttonText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
+  toggle: { marginTop: 15, textAlign: "center", color: "#007BFF", fontWeight: "600" },
 });
