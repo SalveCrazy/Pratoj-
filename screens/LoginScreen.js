@@ -12,7 +12,7 @@ export default function LoginScreen({ navigation }) {
       // Login do administrador
       if (senha === "1234") {
         Alert.alert("Sucesso", "Bem-vindo, Administrador!");
-        navigation.navigate("AdminHome"); // Tela do ADM
+        setLogado(true); // usuário logado
       } else {
         Alert.alert("Erro", "Senha incorreta!");
       }
@@ -22,6 +22,7 @@ export default function LoginScreen({ navigation }) {
       if (senha === "3212") {
         Alert.alert("Sucesso", `Bem-vindo aluno ${matricula}`);
         navigation.navigate("AlunoHome"); // Tela do Aluno
+        setLogado(true); // usuário logado
       } else {
         Alert.alert("Erro", "Digite sua matrícula!");
       }
