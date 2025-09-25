@@ -8,7 +8,7 @@ export default function AdmScreen() {
   const [alunos, setAlunos] = useState([]);
   const [ticketsHoje, setTicketsHoje] = useState([]);
 
-  // carregar dados ao abrir
+  
   useEffect(() => {
     loadAlunos();
     loadTicketsHoje();
@@ -90,11 +90,44 @@ export default function AdmScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: "#fff" },
-  title: { fontSize: 24, fontWeight: "bold", marginBottom: 20, textAlign: "center" },
-  subtitle: { fontSize: 18, marginTop: 20, marginBottom: 10, fontWeight: "bold" },
-  input: { borderWidth: 1, borderColor: "#ccc", borderRadius: 8, padding: 10, marginBottom: 10 },
-  button: { backgroundColor: "#4a148c", padding: 12, borderRadius: 8, alignItems: "center" },
-  buttonText: { color: "#fff", fontWeight: "bold" },
-  listItem: { padding: 8, borderBottomWidth: 1, borderColor: "#eee" },
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: "#fff",
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  subtitle: {
+    fontSize: 18,
+    marginTop: 20,
+    marginBottom: 10,
+    fontWeight: "bold",
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 10,
+  },
+  button: {
+    backgroundColor: "#4a148c",
+    padding: 12,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  listItem: {
+    padding: 8,
+    borderBottomWidth: 1,
+    borderColor: "#eee",
+  },
 });
+
