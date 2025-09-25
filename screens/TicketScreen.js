@@ -10,12 +10,12 @@ export default function TicketScreen({ navigation, route }) {
   const horaIntervalo = 10;
   const minutoIntervalo = 0;
 
-  // Pegando dados do aluno vindos da LoginScreen
+  
   const { matricula } = route.params || {};
   const [alunoNome, setAlunoNome] = useState("");
 
   useEffect(() => {
-    // tenta buscar o nome do aluno pelo cadastro
+    
     const loadAluno = async () => {
       const data = await AsyncStorage.getItem("alunos");
       if (data) {
@@ -27,7 +27,7 @@ export default function TicketScreen({ navigation, route }) {
     if (matricula) loadAluno();
   }, [matricula]);
 
-  // verificar horário do intervalo
+  
   useEffect(() => {
     const checkHorario = () => {
       const agora = new Date();
@@ -41,7 +41,7 @@ export default function TicketScreen({ navigation, route }) {
     return () => clearInterval(timer);
   }, []);
 
-  // carregar status do ticket salvo
+  
   useEffect(() => {
     const loadTicket = async () => {
       const hoje = new Date().toLocaleDateString();
@@ -54,7 +54,7 @@ export default function TicketScreen({ navigation, route }) {
     loadTicket();
   }, []);
 
-  // receber ticket
+  
   const handleReceberTicket = async () => {
     if (!naEscola) {
       Alert.alert("Erro", "Você precisa estar na escola para receber o ticket!");
@@ -69,11 +69,11 @@ export default function TicketScreen({ navigation, route }) {
       return;
     }
 
-    // salva ticket atual
+    
     const ticketAtual = { date: hoje, aluno: alunoNome || "Aluno", matricula, usado: false };
     await AsyncStorage.setItem("ticketData", JSON.stringify(ticketAtual));
 
-    // adiciona no histórico geral de tickets
+   
     const listaTickets = JSON.parse(await AsyncStorage.getItem("tickets")) || [];
     listaTickets.push(ticketAtual);
     await AsyncStorage.setItem("tickets", JSON.stringify(listaTickets));
@@ -113,13 +113,43 @@ export default function TicketScreen({ navigation, route }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#f3e5f5" },
-  title: { fontSize: 24, fontWeight: "bold", marginBottom: 20, color: "#4a148c" },
-  status: { fontSize: 18, marginBottom: 20, color: "#333" },
-  toggleButton: { padding: 15, borderRadius: 8, marginBottom: 20, width: "70%", alignItems: "center" },
-  inSchool: { backgroundColor: "#81c784" },
-  outSchool: { backgroundColor: "#e57373" },
-  toggleText: { fontSize: 16, fontWeight: "bold", color: "#fff" },
-  button: { backgroundColor: "#7b1fa2", padding: 15, borderRadius: 8, width: "70%", alignItems: "center" },
-  buttonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: "#fff",
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  subtitle: {
+    fontSize: 18,
+    marginTop: 20,
+    marginBottom: 10,
+    fontWeight: "bold",
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 10,
+  },
+  button: {
+    backgroundColor: "#4a148c",
+    padding: 12,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  listItem: {
+    padding: 8,
+    borderBottomWidth: 1,
+    borderColor: "#eee",
+  },
 });
