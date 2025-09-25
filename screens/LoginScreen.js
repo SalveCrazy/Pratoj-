@@ -5,20 +5,20 @@ export default function LoginScreen({ navigation }) {
   const [matricula, setMatricula] = useState("");
   const [senha, setSenha] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
-  const [logado, setLogado] = useState(false); // novo estado para controlar login
+  const [logado, setLogado] = useState(false);
 
   const handleLogin = () => {
     if (isAdmin) {
       if (senha === "1234") {
         Alert.alert("Sucesso", "Bem-vindo, Administrador!");
-        setLogado(true); // usuário logado
+        setLogado(true);
       } else {
         Alert.alert("Erro", "Senha incorreta!");
       }
     } else {
       if (matricula.trim() !== "") {
         Alert.alert("Sucesso", `Bem-vindo aluno ${matricula}`);
-        setLogado(true); // usuário logado
+        setLogado(true);
       } else {
         Alert.alert("Erro", "Digite sua matrícula!");
       }
@@ -27,7 +27,7 @@ export default function LoginScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
+      <Text style={styles.title}>Seja bem-vindo</Text>
 
       {isAdmin ? (
         <TextInput
@@ -56,14 +56,32 @@ export default function LoginScreen({ navigation }) {
         </Text>
       </TouchableOpacity>
 
-      {/* Botão só aparece se o usuário estiver logado */}
-      {logado && (
+      {/* Botões só aparecem se logado */}
+      {logado && !isAdmin && (
         <TouchableOpacity
-          style={[styles.button, { marginTop: 20, backgroundColor: "#7b1fa2" }]}
-          onPress={() => navigation.navigate("Ticket")}
+          style={[styles.button, { marginTop: 20, backgroundColor: "#9c51bdff" }]}
+          onPress={() => navigation.navigate("Ticket", { matricula })}
         >
           <Text style={styles.buttonText}>Ir para Receber Ticket</Text>
         </TouchableOpacity>
+      )}
+
+      {logado && isAdmin && (
+        <>
+          <TouchableOpacity
+            style={[styles.button, { marginTop: 20, backgroundColor: "#4CAF50" }]}
+            onPress={() => navigation.navigate("Adm")}
+          >
+            <Text style={styles.buttonText}>Ir para Painel ADM</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.button, { marginTop: 20, backgroundColor: "#3f51b5" }]}
+            onPress={() => navigation.navigate("Validacao")}
+          >
+            <Text style={styles.buttonText}>Ir para Validação de Tickets</Text>
+          </TouchableOpacity>
+        </>
       )}
     </View>
   );
@@ -73,7 +91,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: "center", padding: 20, backgroundColor: "#f5f5f5" },
   title: { fontSize: 26, fontWeight: "bold", textAlign: "center", marginBottom: 20 },
   input: { backgroundColor: "#fff", padding: 12, borderRadius: 8, borderWidth: 1, borderColor: "#ccc", marginBottom: 12 },
-  button: { backgroundColor: "#4CAF50", padding: 15, borderRadius: 8, alignItems: "center" },
+  button: { backgroundColor: "#7ccf7fff", padding: 15, borderRadius: 8, alignItems: "center" },
   buttonText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
   toggle: { marginTop: 15, textAlign: "center", color: "#007BFF", fontWeight: "600" },
 });
