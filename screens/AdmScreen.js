@@ -10,7 +10,10 @@ export default function AdmScreen() {
   const [tickets, setTickets] = useState([]);
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
   useEffect(() => {
@@ -75,6 +78,7 @@ export default function AdmScreen() {
 
 const styles = StyleSheet.create({
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   container: {
     flex: 1,
     padding: 20,
@@ -115,12 +119,17 @@ const styles = StyleSheet.create({
     borderColor: "#eee",
   },
 =======
+=======
+>>>>>>> Stashed changes
   container: { flex: 1, padding: 20 },
   title: { fontSize: 22, fontWeight: "bold", marginBottom: 20 },
   input: { borderWidth: 1, borderColor: "#aaa", padding: 10, marginBottom: 10, borderRadius: 6 },
   button: { backgroundColor: "#4CAF50", padding: 12, borderRadius: 6, marginBottom: 10, alignItems: "center" },
   buttonText: { color: "#fff", fontWeight: "bold" },
   subtitle: { fontSize: 18, marginTop: 15, fontWeight: "600" },
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 });
 
