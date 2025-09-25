@@ -6,6 +6,8 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import LoginScreen from "./screens/LoginScreen";  
 import TicketScreen from "./screens/TicketScreen";
 import HomeAluno from "./screens/HomeAluno";
+import AdmScreen from "./screens/AdmScreen"; // ./screens/AdmScreen.js
+
 
 const Stack = createNativeStackNavigator();
 
@@ -18,6 +20,15 @@ export default function App() {
           component={LoginScreen}
           options={{ headerShown: false }}
         />
+
+        import AdmScreen from "./screens/AdmScreen"; // o caminho tem que estar certo
+
+<Stack.Screen
+  name="Adm"        // 👈 esse nome precisa bater com o que você usa no navigate
+  component={AdmScreen}
+  options={{ title: "Painel ADM" }}
+/>
+
 
         <Stack.Screen
           name="AlunoHome"
