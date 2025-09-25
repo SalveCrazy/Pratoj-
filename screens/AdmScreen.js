@@ -10,16 +10,15 @@ export default function AdmScreen() {
 
 
     carregarDados();
-  } []()
-
-  const carregarDados = async () => {
-    const alunosSalvos = await AsyncStorage.getItem("alunos");
-    const ticketsSalvos = await AsyncStorage.getItem("tickets");
-    if (alunosSalvos) setAlunos(JSON.parse(alunosSalvos));
-    if (ticketsSalvos) setTickets(JSON.parse(ticketsSalvos));
-  };
-
-  const salvarAluno = async () => {
+    
+    const carregarDados = async () => {
+        const alunosSalvos = await AsyncStorage.getItem("alunos");
+        const ticketsSalvos = await AsyncStorage.getItem("tickets");
+        if (alunosSalvos) setAlunos(JSON.parse(alunosSalvos));
+        if (ticketsSalvos) setTickets(JSON.parse(ticketsSalvos));
+    };
+    
+    const salvarAluno = async () => {
     if (!nome || !matricula) return Alert.alert("Preencha todos os campos!");
     const novo = { nome, matricula };
     const lista = [...alunos, novo];
@@ -28,15 +27,15 @@ export default function AdmScreen() {
     setNome("");
     setMatricula("");
     Alert.alert("Aluno cadastrado!");
-  };
+};
 
-  const resetarTickets = async () => {
+const resetarTickets = async () => {
     await AsyncStorage.removeItem("tickets");
     setTickets([]);
     Alert.alert("Tickets resetados!");
-  };
+};
 
-  return (
+return (
     <View style={styles.container}>
       <Text style={styles.title}>Painel ADM</Text>
 
@@ -56,22 +55,23 @@ export default function AdmScreen() {
         data={alunos}
         keyExtractor={(item) => item.matricula}
         renderItem={({ item }) => <Text>{item.matricula} - {item.nome}</Text>}
-      />
+        />
 
       <Text style={styles.subtitle}>Tickets de hoje</Text>
       <FlatList
         data={tickets}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => <Text>{item.matricula} - {item.status}</Text>}
-      />
+        />
     </View>
   );
   
-
-const styles = StyleSheet.create({
-
-
-  container: {
+} 
+  
+  const styles = StyleSheet.create({
+      
+      
+      container: {
     flex: 1,
     padding: 20,
     backgroundColor: "#fff",

@@ -1,17 +1,14 @@
-
 // HomeScreen.js
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 
 export default function HomeScreen({ navigation, route }) {
-  // Pega o tipo de usuário que veio do login
   const { userType } = route.params || {};
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Bem-vindo ao App!</Text>
 
-      {/* Botão só aparece pra alunos */}
       {userType === "aluno" && (
         <TouchableOpacity
           style={styles.button}
@@ -35,7 +32,6 @@ export default function HomeScreen({ navigation, route }) {
         <Text style={styles.buttonText}>Localização</Text>
       </TouchableOpacity>
 
-      {/* Botão só aparece pra admin */}
       {userType === "admin" && (
         <TouchableOpacity
           style={styles.button}

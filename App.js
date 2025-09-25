@@ -1,15 +1,16 @@
 // App.js
-import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createStackNavigator } from "@react-navigation/stack";
 
-import LoginScreen from "./screens/LoginScreen";  
+// Importa telas
+import LoginScreen from "./screens/LoginScreen";
+import HomeScreen from "./screens/HomeScreen";
 import TicketScreen from "./screens/TicketScreen";
-import HomeAluno from "./screens/HomeAluno";
-import AdmScreen from "./screens/AdmScreen"; // ./screens/AdmScreen.js
+import IntervaloScreen from "./screens/IntervaloScreen";
+// import LocalizacaoScreen from "./screens/LocalizacaoScreen";
+import AdmScreen from "./screens/AdmScreen";
 
-
-const Stack = createNativeStackNavigator();
+const Stack = createStackNavigator();
 
 export default function App() {
   return (
@@ -18,28 +19,32 @@ export default function App() {
         <Stack.Screen
           name="Login"
           component={LoginScreen}
-          options={{ headerShown: false }}
+          options={{ title: "Login" }}
         />
-
-        import AdmScreen from "./screens/AdmScreen"; // o caminho tem que estar certo
-
-<Stack.Screen
-  name="Adm"        // 👈 esse nome precisa bater com o que você usa no navigate
-  component={AdmScreen}
-  options={{ title: "Painel ADM" }}
-/>
-
-
         <Stack.Screen
-          name="AlunoHome"
-          component={HomeAluno}
-          options={{ title: "Home do Aluno" }}
+          name="Home"
+          component={HomeScreen}
+          options={{ title: "Menu" }}
         />
-
         <Stack.Screen
           name="Ticket"
           component={TicketScreen}
           options={{ title: "Receber Ticket" }}
+        />
+        <Stack.Screen
+          name="Intervalo"
+          component={IntervaloScreen}
+          options={{ title: "Intervalo" }}
+        />
+        {/* <Stack.Screen
+          name="Localizacao"
+          component={LocalizacaoScreen}
+          options={{ title: "Localização" }}
+        /> */}
+        <Stack.Screen
+          name="Adm"
+          component={AdmScreen}
+          options={{ title: "Painel ADM" }}
         />
       </Stack.Navigator>
     </NavigationContainer>
