@@ -1,4 +1,3 @@
-// screens/AdmScreen.js
 import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -9,16 +8,9 @@ export default function AdmScreen() {
   const [alunos, setAlunos] = useState([]);
   const [tickets, setTickets] = useState([]);
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-  
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-  useEffect(() => {
+
     carregarDados();
-  }, []);
+  } []()
 
   const carregarDados = async () => {
     const alunosSalvos = await AsyncStorage.getItem("alunos");
@@ -74,11 +66,11 @@ export default function AdmScreen() {
       />
     </View>
   );
-}
+  
 
 const styles = StyleSheet.create({
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
+
+
   container: {
     flex: 1,
     padding: 20,
@@ -118,18 +110,13 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: "#eee",
   },
-=======
-=======
->>>>>>> Stashed changes
+
   container: { flex: 1, padding: 20 },
   title: { fontSize: 22, fontWeight: "bold", marginBottom: 20 },
   input: { borderWidth: 1, borderColor: "#aaa", padding: 10, marginBottom: 10, borderRadius: 6 },
   button: { backgroundColor: "#4CAF50", padding: 12, borderRadius: 6, marginBottom: 10, alignItems: "center" },
   buttonText: { color: "#fff", fontWeight: "bold" },
   subtitle: { fontSize: 18, marginTop: 15, fontWeight: "600" },
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
+
 });
 
