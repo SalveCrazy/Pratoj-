@@ -1,3 +1,4 @@
+// screens/AdmScreen.js
 import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -6,90 +7,78 @@ export default function AdmScreen() {
   const [nome, setNome] = useState("");
   const [matricula, setMatricula] = useState("");
   const [alunos, setAlunos] = useState([]);
-  const [ticketsHoje, setTicketsHoje] = useState([]);
+  const [tickets, setTickets] = useState([]);
 
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   
+=======
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
   useEffect(() => {
-    loadAlunos();
-    loadTicketsHoje();
+    carregarDados();
   }, []);
 
-  const loadAlunos = async () => {
-    const data = await AsyncStorage.getItem("alunos");
-    if (data) setAlunos(JSON.parse(data));
+  const carregarDados = async () => {
+    const alunosSalvos = await AsyncStorage.getItem("alunos");
+    const ticketsSalvos = await AsyncStorage.getItem("tickets");
+    if (alunosSalvos) setAlunos(JSON.parse(alunosSalvos));
+    if (ticketsSalvos) setTickets(JSON.parse(ticketsSalvos));
   };
 
-  const loadTicketsHoje = async () => {
-    const hoje = new Date().toLocaleDateString();
-    const data = await AsyncStorage.getItem("tickets");
-    if (data) {
-      const list = JSON.parse(data);
-      const filtrados = list.filter(t => t.date === hoje);
-      setTicketsHoje(filtrados);
-    }
-  };
-
-  const handleCadastrar = async () => {
-    if (!nome || !matricula) {
-      Alert.alert("Erro", "Preencha todos os campos!");
-      return;
-    }
-    const novoAluno = { nome, matricula };
-    const novaLista = [...alunos, novoAluno];
-    setAlunos(novaLista);
-    await AsyncStorage.setItem("alunos", JSON.stringify(novaLista));
+  const salvarAluno = async () => {
+    if (!nome || !matricula) return Alert.alert("Preencha todos os campos!");
+    const novo = { nome, matricula };
+    const lista = [...alunos, novo];
+    setAlunos(lista);
+    await AsyncStorage.setItem("alunos", JSON.stringify(lista));
     setNome("");
     setMatricula("");
-    Alert.alert("Sucesso", "Aluno cadastrado!");
+    Alert.alert("Aluno cadastrado!");
   };
 
-  const handleReset = async () => {
+  const resetarTickets = async () => {
     await AsyncStorage.removeItem("tickets");
-    setTicketsHoje([]);
-    Alert.alert("Sucesso", "Tickets resetados!");
+    setTickets([]);
+    Alert.alert("Tickets resetados!");
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>⚙️ Painel do Administrador</Text>
+      <Text style={styles.title}>Painel ADM</Text>
 
-      <Text style={styles.subtitle}>Cadastrar Aluno</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Nome do aluno"
-        value={nome}
-        onChangeText={setNome}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Matrícula"
-        value={matricula}
-        onChangeText={setMatricula}
-      />
-      <TouchableOpacity style={styles.button} onPress={handleCadastrar}>
-        <Text style={styles.buttonText}>Cadastrar</Text>
+      <TextInput style={styles.input} placeholder="Nome" value={nome} onChangeText={setNome} />
+      <TextInput style={styles.input} placeholder="Matrícula" value={matricula} onChangeText={setMatricula} />
+
+      <TouchableOpacity style={styles.button} onPress={salvarAluno}>
+        <Text style={styles.buttonText}>Cadastrar Aluno</Text>
       </TouchableOpacity>
 
-      <Text style={styles.subtitle}>Alunos que pegaram ticket hoje</Text>
+      <TouchableOpacity style={[styles.button, { backgroundColor: "red" }]} onPress={resetarTickets}>
+        <Text style={styles.buttonText}>Resetar Tickets</Text>
+      </TouchableOpacity>
+
+      <Text style={styles.subtitle}>Alunos cadastrados</Text>
       <FlatList
-        data={ticketsHoje}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => (
-          <Text style={styles.listItem}>{item.aluno} ({item.matricula})</Text>
-        )}
+        data={alunos}
+        keyExtractor={(item) => item.matricula}
+        renderItem={({ item }) => <Text>{item.matricula} - {item.nome}</Text>}
       />
 
-      <TouchableOpacity
-        style={[styles.button, { backgroundColor: "red", marginTop: 20 }]}
-        onPress={handleReset}
-      >
-        <Text style={styles.buttonText}>Resetar Tickets do Dia</Text>
-      </TouchableOpacity>
+      <Text style={styles.subtitle}>Tickets de hoje</Text>
+      <FlatList
+        data={tickets}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item }) => <Text>{item.matricula} - {item.status}</Text>}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   container: {
     flex: 1,
     padding: 20,
@@ -129,5 +118,18 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: "#eee",
   },
+=======
+=======
+>>>>>>> Stashed changes
+  container: { flex: 1, padding: 20 },
+  title: { fontSize: 22, fontWeight: "bold", marginBottom: 20 },
+  input: { borderWidth: 1, borderColor: "#aaa", padding: 10, marginBottom: 10, borderRadius: 6 },
+  button: { backgroundColor: "#4CAF50", padding: 12, borderRadius: 6, marginBottom: 10, alignItems: "center" },
+  buttonText: { color: "#fff", fontWeight: "bold" },
+  subtitle: { fontSize: 18, marginTop: 15, fontWeight: "600" },
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
 });
 
