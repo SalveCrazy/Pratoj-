@@ -3,8 +3,8 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 
 // Importa telas
-import LoginScreen from "./screens/LoginScreen";
 import HomeScreen from "./screens/HomeScreen";
+import LoginScreen from "./screens/LoginScreen";
 import TicketScreen from "./screens/TicketScreen";
 import IntervaloScreen from "./screens/IntervaloScreen";
 // import LocalizacaoScreen from "./screens/LocalizacaoScreen";
@@ -15,17 +15,24 @@ const Stack = createStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
+      {/* 🚀 AQUI está a mudança: 'initialRouteName' agora é "HomeAluno" e removemos a propriedade incorreta 'initialRouteHomeScreen' */}
+      <Stack.Navigator initialRouteName="HomeAluno" screenOptions={{ headerShown: false }}> 
+
+        {/* 1. Mova a HomeAluno para a primeira posição (Boa Prática) */}
+        <Stack.Screen
+          name="HomeAluno" // É este nome que deve estar em 'initialRouteName'
+          component={HomeScreen}
+          options={{ title: "Menu" }}
+        />
+
+        {/* 2. Login, agora é a segunda tela */}
         <Stack.Screen
           name="Login"
           component={LoginScreen}
           options={{ title: "Login" }}
         />
-        <Stack.Screen
-          name="Home"
-          component={HomeScreen}
-          options={{ title: "Menu" }}
-        />
+        
+        {/* As outras telas continuam abaixo */}
         <Stack.Screen
           name="Ticket"
           component={TicketScreen}
@@ -42,7 +49,7 @@ export default function App() {
           options={{ title: "Localização" }}
         /> */}
         <Stack.Screen
-          name="Adm"
+          name="AdmScreen"
           component={AdmScreen}
           options={{ title: "Painel ADM" }}
         />

@@ -8,7 +8,7 @@ export default function LoginScreen({ navigation }) {
 
   const handleLogin = () => {
     // 🔑 Validação admin
-    if (matricula === "admin" && senha === "admin123") {
+    if (matricula === "adm" && senha === "123") {
       Alert.alert("Sucesso", "Bem-vindo administrador!");
       setLogado(true);
       navigation.navigate("AdmScreen"); // redireciona pra tela do admin
