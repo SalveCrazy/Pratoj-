@@ -1,49 +1,66 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage"; // Importado
 
-export default function LoginScreen({ navigation }) {
+export default function LoginScreen({ navigation, route }) {
   const [matricula, setMatricula] = useState("");
   const [senha, setSenha] = useState("");
-  const [logado, setLogado] = useState(false);
+  const userType = route.params?.userType; // Pega o tipo de usuário passado pela HomeScreen
 
-  const handleLogin = () => {
-    // 🔑 Validação admin
-    if (matricula === "adm" && senha === "123") {
-      Alert.alert("Sucesso", "Bem-vindo administrador!");
-      setLogado(true);
-      navigation.navigate("AdmScreen"); // redireciona pra tela do admin
-    } 
-    // 🔑 Validação aluno
-    else {
-      if (!matricula.trim() || !senha.trim()) {
-        Alert.alert("Erro", "Digite sua matrícula e senha!");
-        return;
-      }
-
-      if (senha === "1234") { // senha padrão de aluno (pode trocar)
-        Alert.alert("Sucesso", `Bem-vindo aluno ${matricula}`);
-        setLogado(true);
-        navigation.navigate("HomeAluno"); // redireciona pra tela do aluno
-      } else {
-        Alert.alert("Erro", "Senha incorreta!");
-      }
+  const handleLogin = async () => {
+    if (!matricula.trim() || !senha.trim()) {
+      Alert.alert("Erro", "Digite sua matrícula e senha!");
+      return;
     }
+
+    // Login ADM
+    if (userType === "admin" && matricula === "adm" && senha === "123") {
+      navigation.navigate("AdmScreen");
+      return;
+    }
+
+    // Login Atendente (para Validar Ticket)
+    if (userType === "atendente" && matricula === "valida" && senha === "999") { // Novo login de atendente
+      navigation.navigate("Validacao");
+      return;
+    }
+    
+    // Login Aluno
+    if (userType === "aluno") {
+      const alunosData = await AsyncStorage.getItem("alunos");
+      const alunos = alunosData ? JSON.parse(alunosData) : [];
+      const aluno = alunos.find(a => a.matricula === matricula);
+
+      if (aluno && senha === "1234") { // Usa senha padrão ou a que você definir
+        Alert.alert("Sucesso", `Bem-vindo(a), ${aluno.nome}!`);
+        // Navega para a HomeAluno, passando os dados do aluno para a próxima tela
+        navigation.navigate("HomeAluno", { aluno }); 
+      } else if (aluno) {
+        Alert.alert("Erro", "Senha incorreta!");
+      } else {
+        Alert.alert("Erro", "Matrícula não encontrada.");
+      }
+      return;
+    }
+    
+    // Caso caia aqui, deve ser um login vindo direto (pode ser ajustado)
+    Alert.alert("Erro", "Tipo de usuário não especificado ou credenciais incorretas.");
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
+      <Text style={styles.title}>Login ({userType === 'admin' ? 'ADM' : userType === 'aluno' ? 'Aluno' : 'Validação'})</Text>
 
       <TextInput
         style={styles.input}
-        placeholder="Digite sua matrícula"
+        placeholder="Matrícula"
         value={matricula}
         onChangeText={setMatricula}
       />
 
       <TextInput
         style={styles.input}
-        placeholder="Digite sua senha"
+        placeholder="Senha"
         secureTextEntry
         value={senha}
         onChangeText={setSenha}
@@ -57,6 +74,7 @@ export default function LoginScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+// ... Seus estilos permanecem os mesmos
   container: {
     flex: 1,
     justifyContent: "center",

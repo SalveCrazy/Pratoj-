@@ -1,77 +1,140 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import React, { useState } from "react";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default function ValidacaoScreen({ navigation }) {
-  const [ticketStatus, setTicketStatus] = useState("Nenhum ticket encontrado");
-  const [matricula, setMatricula] = useState(null);
+const getToday = () => new Date().toLocaleDateString();
 
-  useEffect(() => {
-    const loadTicket = async () => {
-      const recebido = await AsyncStorage.getItem("ticketData");
-      if (recebido) {
-        const { date, usado, aluno } = JSON.parse(recebido);
-        const hoje = new Date().toLocaleDateString();
-        if (date === hoje) {
-          setMatricula(aluno || "Aluno não identificado");
-          setTicketStatus(usado ? "❌ Ticket já usado" : "✅ Ticket disponível");
+export default function ValidacaoScreen() {
+    const [inputMatricula, setInputMatricula] = useState("");
+    const [ticketInfo, setTicketInfo] = useState(null);
+    const [alunoNome, setAlunoNome] = useState("---");
+
+    const buscarTicket = async () => {
+        if (!inputMatricula) {
+            setTicketInfo(null);
+            return Alert.alert("Erro", "Digite a matrícula para buscar.");
         }
-      }
+
+        const ticketsData = await AsyncStorage.getItem("tickets");
+        const tickets = ticketsData ? JSON.parse(ticketsData) : [];
+        const hoje = getToday();
+
+        // 1. Encontra o ticket do aluno para hoje
+        const ticket = tickets.find(
+            (t) => t.matricula === inputMatricula && t.date === hoje
+        );
+        
+        // 2. Busca o nome do aluno
+        const alunosData = await AsyncStorage.getItem("alunos");
+        const alunos = alunosData ? JSON.parse(alunosData) : [];
+        const aluno = alunos.find(a => a.matricula === inputMatricula);
+        setAlunoNome(aluno ? aluno.nome : "Aluno não cadastrado");
+
+        if (ticket) {
+            setTicketInfo(ticket);
+        } else {
+            setTicketInfo({ matricula: inputMatricula, usado: true }); // Simula "já usado" para desabilitar o botão
+            Alert.alert("Aviso", "Ticket não encontrado para esta matrícula hoje.");
+        }
     };
-    loadTicket();
-  }, []);
 
-  const handleUsarTicket = async () => {
-    const recebido = await AsyncStorage.getItem("ticketData");
-    if (!recebido) {
-      Alert.alert("Erro", "Nenhum ticket para validar.");
-      return;
-    }
+    const handleUsarTicket = async () => {
+        if (!ticketInfo || ticketInfo.usado) {
+            Alert.alert("Erro", "Ticket não disponível ou já usado.");
+            return;
+        }
 
-    const { date, aluno } = JSON.parse(recebido);
-    const hoje = new Date().toLocaleDateString();
+        const ticketsData = await AsyncStorage.getItem("tickets");
+        let listaTickets = ticketsData ? JSON.parse(ticketsData) : [];
 
-    if (date !== hoje) {
-      Alert.alert("Erro", "Ticket não é válido para hoje.");
-      return;
-    }
+        // Atualiza o ticket na lista como 'usado: true'
+        listaTickets = listaTickets.map(t => 
+            t.matricula === ticketInfo.matricula && t.date === getToday()
+                ? { ...t, usado: true } 
+                : t
+        );
+        
+        await AsyncStorage.setItem("tickets", JSON.stringify(listaTickets));
+        
+        // Atualiza o estado local
+        setTicketInfo(prev => ({ ...prev, usado: true }));
+        Alert.alert("Sucesso", `Ticket de ${alunoNome} validado e marcado como USADO!`);
+    };
+    
+    // Status visual
+    const statusText = ticketInfo 
+        ? (ticketInfo.usado ? "❌ USADO HOJE" : "✅ DISPONÍVEL") 
+        : "Aguardando busca...";
+    const statusColor = ticketInfo 
+        ? (ticketInfo.usado ? "#D62828" : "#4CAF50") 
+        : "#888";
 
-    await AsyncStorage.setItem(
-      "ticketData",
-      JSON.stringify({ date: hoje, usado: true, aluno })
+
+    return (
+        <View style={styles.container}>
+            <Text style={styles.title}>🔎 Validação do Ticket</Text>
+            
+            <TextInput
+                style={styles.input}
+                placeholder="Digite a Matrícula do Aluno"
+                value={inputMatricula}
+                onChangeText={setInputMatricula}
+                keyboardType="numeric"
+            />
+            
+            <TouchableOpacity style={styles.searchButton} onPress={buscarTicket}>
+                <Text style={styles.buttonText}>Buscar Ticket</Text>
+            </TouchableOpacity>
+
+            <View style={styles.infoBox}>
+                <Text style={styles.infoTitle}>Informações do Ticket:</Text>
+                <Text style={styles.infoText}>Matrícula: {inputMatricula || '---'}</Text>
+                <Text style={styles.infoText}>Nome: {alunoNome}</Text>
+                <Text style={[styles.statusText, { color: statusColor }]}>Status: {statusText}</Text>
+            </View>
+
+            <TouchableOpacity 
+                style={[
+                    styles.validateButton, 
+                    { 
+                        backgroundColor: ticketInfo && !ticketInfo.usado ? "#007AFF" : "#A9A9A9" 
+                    }
+                ]} 
+                onPress={handleUsarTicket}
+                disabled={!ticketInfo || ticketInfo.usado} // Desabilita se não encontrou ou já foi usado
+            >
+                <Text style={styles.buttonText}>VALIDAR E USAR TICKET</Text>
+            </TouchableOpacity>
+        </View>
     );
-
-    setTicketStatus("❌ Ticket já usado");
-    Alert.alert("Sucesso", "Ticket validado e marcado como usado!");
-  };
-
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>🔎 Validação do Ticket</Text>
-      <Text style={styles.info}>Aluno: {matricula || "Não informado"}</Text>
-      <Text style={styles.status}>Status: {ticketStatus}</Text>
-
-      {ticketStatus === "✅ Ticket disponível" && (
-        <TouchableOpacity style={styles.button} onPress={handleUsarTicket}>
-          <Text style={styles.buttonText}>Validar Ticket</Text>
-        </TouchableOpacity>
-      )}
-
-      <TouchableOpacity
-        style={[styles.button, { marginTop: 20, backgroundColor: "#007BFF" }]}
-        onPress={() => navigation.navigate("Login")}
-      >
-        <Text style={styles.buttonText}>Voltar para Login</Text>
-      </TouchableOpacity>
-    </View>
-  );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#e8eaf6" },
-  title: { fontSize: 24, fontWeight: "bold", marginBottom: 20, color: "#1a237e" },
-  info: { fontSize: 18, marginBottom: 10, color: "#333" },
-  status: { fontSize: 18, marginBottom: 20, color: "#555" },
-  button: { backgroundColor: "#3949ab", padding: 15, borderRadius: 8, width: "70%", alignItems: "center" },
-  buttonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
+    container: { flex: 1, padding: 20, backgroundColor: "#f5f5f5" },
+    title: { fontSize: 24, fontWeight: "bold", marginBottom: 30, textAlign: "center" },
+    input: { borderWidth: 1, borderColor: "#ccc", borderRadius: 8, padding: 10, marginBottom: 15, backgroundColor: '#fff' },
+    searchButton: { 
+        backgroundColor: "#FF9500", 
+        padding: 12, 
+        borderRadius: 8, 
+        alignItems: "center", 
+        marginBottom: 30 
+    },
+    buttonText: { color: "#fff", fontWeight: "bold" },
+    infoBox: {
+        borderWidth: 1,
+        borderColor: "#ddd",
+        borderRadius: 8,
+        padding: 15,
+        backgroundColor: '#fff',
+        marginBottom: 30,
+    },
+    infoTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 10 },
+    infoText: { fontSize: 16, marginBottom: 5 },
+    statusText: { fontSize: 20, fontWeight: 'bold', marginTop: 10 },
+    validateButton: {
+        padding: 15,
+        borderRadius: 8,
+        alignItems: "center",
+    },
 });

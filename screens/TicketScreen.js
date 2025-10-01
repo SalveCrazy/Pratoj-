@@ -2,154 +2,171 @@ import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default function TicketScreen({ navigation, route }) {
-  const [ticketStatus, setTicketStatus] = useState("Nenhum ticket recebido");
-  const [naEscola, setNaEscola] = useState(false);
+// Função utilitária para pegar a data de hoje formatada
+const getToday = () => new Date().toLocaleDateString();
+
+export default function TicketScreen({ route }) {
+  const { matricula } = route.params || {}; // Recebe a matrícula do aluno
+  const [ticketStatus, setTicketStatus] = useState("Carregando...");
+  const [naEscola, setNaEscola] = useState(false); // Simulação de Localização
   const [podeReceber, setPodeReceber] = useState(false);
 
+  // Configuração do Intervalo
   const horaIntervalo = 10;
   const minutoIntervalo = 0;
+  const minutosLimiteReceber = 5; // 5 minutos antes do intervalo
 
-  
-  const { matricula } = route.params || {};
-  const [alunoNome, setAlunoNome] = useState("");
-
+  // 1. Carrega o nome do aluno e verifica status do ticket
   useEffect(() => {
-    
-    const loadAluno = async () => {
-      const data = await AsyncStorage.getItem("alunos");
-      if (data) {
-        const lista = JSON.parse(data);
-        const achado = lista.find(a => a.matricula === matricula);
-        if (achado) setAlunoNome(achado.nome);
+    const checkTicketStatus = async () => {
+      if (!matricula) return;
+
+      const ticketsData = await AsyncStorage.getItem("tickets");
+      const tickets = ticketsData ? JSON.parse(ticketsData) : [];
+      const hoje = getToday();
+
+      // Busca o ticket do aluno para hoje
+      const ticketDoAluno = tickets.find(
+        (t) => t.matricula === matricula && t.date === hoje
+      );
+
+      if (ticketDoAluno) {
+        setTicketStatus(
+          ticketDoAluno.usado 
+            ? "❌ Ticket Usado Hoje" 
+            : "✅ Ticket Disponível"
+        );
+      } else {
+        setTicketStatus("Ainda não recebeu o ticket hoje");
       }
     };
-    if (matricula) loadAluno();
+    
+    checkTicketStatus();
+    // Monitora o estado de naEscola e hora para revalidar a permissão
+    const intervalId = setInterval(checkTicketStatus, 5000); 
+    return () => clearInterval(intervalId);
   }, [matricula]);
 
-  
+  // 2. Verifica Horário para Recebimento
   useEffect(() => {
     const checkHorario = () => {
       const agora = new Date();
       const h = agora.getHours();
       const m = agora.getMinutes();
-      const diff = (horaIntervalo * 60 + minutoIntervalo) - (h * 60 + m);
-      setPodeReceber(diff <= 5 && diff >= 0);
+      
+      const tempoTotalAtual = h * 60 + m;
+      const tempoTotalIntervalo = horaIntervalo * 60 + minutoIntervalo;
+      
+      // Diferença em minutos (negativo se já passou)
+      const diff = tempoTotalIntervalo - tempoTotalAtual; 
+      
+      // Permitir receber ticket nos 5 minutos ANTES do intervalo
+      setPodeReceber(diff <= minutosLimiteReceber && diff > 0); 
     };
     checkHorario();
-    const timer = setInterval(checkHorario, 30000);
+    const timer = setInterval(checkHorario, 5000); // 5 segundos para mais precisão
     return () => clearInterval(timer);
   }, []);
 
-  
-  useEffect(() => {
-    const loadTicket = async () => {
-      const hoje = new Date().toLocaleDateString();
-      const recebido = await AsyncStorage.getItem("ticketData");
-      if (recebido) {
-        const { date, aluno, matricula } = JSON.parse(recebido);
-        if (date === hoje) setTicketStatus(`✅ Ticket disponível para ${aluno || matricula}`);
-      }
-    };
-    loadTicket();
-  }, []);
-
-  
+  // 3. Recebimento do Ticket
   const handleReceberTicket = async () => {
+    if (!podeReceber) {
+        Alert.alert("Erro", `Você só pode receber o ticket nos ${minutosLimiteReceber} minutos antes do intervalo (${horaIntervalo}:${minutoIntervalo.toString().padStart(2, '0')}).`);
+        return;
+    }
+    
     if (!naEscola) {
-      Alert.alert("Erro", "Você precisa estar na escola para receber o ticket!");
+      Alert.alert("Erro", "Você precisa estar na escola (Localização) para receber o ticket!");
       return;
     }
 
-    const hoje = new Date().toLocaleDateString();
-    const recebido = await AsyncStorage.getItem("ticketData");
+    const hoje = getToday();
+    const ticketsData = await AsyncStorage.getItem("tickets");
+    const listaTickets = ticketsData ? JSON.parse(ticketsData) : [];
 
-    if (recebido && JSON.parse(recebido).date === hoje) {
+    // 1. Verifica se já recebeu
+    const jaRecebeu = listaTickets.some(
+      (t) => t.matricula === matricula && t.date === hoje
+    );
+
+    if (jaRecebeu) {
       Alert.alert("Aviso", "Você já recebeu um ticket hoje!");
       return;
     }
 
+    // 2. Cria e Salva o novo ticket
+    const novoTicket = { 
+        date: hoje, 
+        matricula, 
+        usado: false,
+        horaRecebimento: new Date().toLocaleTimeString(),
+    };
     
-    const ticketAtual = { date: hoje, aluno: alunoNome || "Aluno", matricula, usado: false };
-    await AsyncStorage.setItem("ticketData", JSON.stringify(ticketAtual));
-
-   
-    const listaTickets = JSON.parse(await AsyncStorage.getItem("tickets")) || [];
-    listaTickets.push(ticketAtual);
+    listaTickets.push(novoTicket);
     await AsyncStorage.setItem("tickets", JSON.stringify(listaTickets));
 
-    setTicketStatus(`✅ Ticket disponível para ${alunoNome || matricula}`);
-    Alert.alert("Sucesso", "Ticket recebido com sucesso!");
+    setTicketStatus("✅ Ticket Disponível");
+    Alert.alert("Sucesso", "Ticket recebido com sucesso! Aproveite o intervalo!");
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>🎟️ Recebimento de Ticket</Text>
-      <Text style={styles.status}>Status: {ticketStatus}</Text>
+      
+      <Text style={styles.infoText}>Matrícula: {matricula}</Text>
+      <Text style={[styles.infoText, { marginBottom: 20 }]}>Status Atual: <Text style={{fontWeight: 'bold', color: ticketStatus.includes('Disponível') ? 'green' : 'red'}}>{ticketStatus}</Text></Text>
 
+      {/* Simulação de Localização */}
       <TouchableOpacity
         style={[styles.toggleButton, naEscola ? styles.inSchool : styles.outSchool]}
         onPress={() => setNaEscola(!naEscola)}
       >
         <Text style={styles.toggleText}>
-          {naEscola ? "📍 Estou na Escola" : "🚶‍♂️ Não estou na Escola"}
+          {naEscola ? "📍 Localização: Estou na Escola" : "🚶‍♂️ Localização: Fora da Escola"}
         </Text>
       </TouchableOpacity>
+      <Text style={styles.smallText}>Clique acima para simular sua localização na escola.</Text>
 
-      {podeReceber && (
-        <TouchableOpacity style={styles.button} onPress={handleReceberTicket}>
-          <Text style={styles.buttonText}>Receber Ticket</Text>
-        </TouchableOpacity>
-      )}
 
-      <TouchableOpacity
-        style={[styles.button, { marginTop: 20, backgroundColor: "#007BFF" }]}
-        onPress={() => navigation.navigate("Login")}
+      {/* Botão de Receber Ticket */}
+      <TouchableOpacity 
+        style={[
+          styles.button, 
+          { 
+            backgroundColor: podeReceber && naEscola && !ticketStatus.includes('Disponível') ? "#4CAF50" : "#A9A9A9",
+          }
+        ]} 
+        onPress={handleReceberTicket}
+        disabled={!podeReceber || !naEscola || ticketStatus.includes('Disponível')}
       >
-        <Text style={styles.buttonText}>Voltar para Login</Text>
+        <Text style={styles.buttonText}>
+          {podeReceber ? "Receber Ticket" : `Recebimento em ${minutosLimiteReceber} min antes das ${horaIntervalo}:${minutoIntervalo.toString().padStart(2, '0')}`}
+        </Text>
       </TouchableOpacity>
+      
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: "#fff",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-    textAlign: "center",
-  },
-  subtitle: {
-    fontSize: 18,
-    marginTop: 20,
-    marginBottom: 10,
-    fontWeight: "bold",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 10,
-  },
-  button: {
-    backgroundColor: "#4a148c",
-    padding: 12,
+  container: { flex: 1, padding: 20, backgroundColor: "#fff" },
+  title: { fontSize: 24, fontWeight: "bold", marginBottom: 30, textAlign: "center" },
+  infoText: { fontSize: 16, marginBottom: 5 },
+  smallText: { fontSize: 12, color: '#888', marginBottom: 20, textAlign: 'center' },
+  toggleButton: {
+    padding: 15,
     borderRadius: 8,
     alignItems: "center",
+    marginBottom: 10,
   },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
+  inSchool: { backgroundColor: "#4CAF50" },
+  outSchool: { backgroundColor: "#FFC107" },
+  toggleText: { color: "#fff", fontWeight: "bold" },
+  button: {
+    padding: 15,
+    borderRadius: 8,
+    alignItems: "center",
+    marginTop: 30,
   },
-  listItem: {
-    padding: 8,
-    borderBottomWidth: 1,
-    borderColor: "#eee",
-  },
+  buttonText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
 });
