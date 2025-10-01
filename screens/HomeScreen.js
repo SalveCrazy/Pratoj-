@@ -1,60 +1,124 @@
 // HomeScreen.js
-import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import React, { useEffect, useRef } from "react";
+import { View, Text, TouchableOpacity, StyleSheet, Animated, Dimensions } from "react-native";
 
-export default function HomeScreen({ navigation, route }) {
-  const { userType } = route.params || {};
+const { width, height } = Dimensions.get("window");
+const FOODS = ["🍔", "🍕", "🍎", "🍗", "🥗", "🍩", "🥪"];
+
+export default function HomeScreen({ navigation }) {
+  const animations = useRef(
+    FOODS.map(() => ({
+      y: new Animated.Value(-100),
+      x: new Animated.Value(Math.random() * width),
+    }))
+  ).current;
+
+  useEffect(() => {
+    animations.forEach((anim, index) => {
+      const loop = () => {
+        // reset start position
+        anim.y.setValue(-100);
+        anim.x.setValue(Math.random() * (width - 50));
+
+        Animated.timing(anim.y, {
+          toValue: height + 100,
+          duration: Math.random() * 3000 + 2500, // 2.5s - 5.5s
+          useNativeDriver: true,
+        }).start(() => loop());
+      };
+
+      // stagger start so they don't fall all at once
+      setTimeout(loop, index * 600);
+    });
+  }, []);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Bem-vindo ao App!</Text>
-
-      {userType === "aluno" && (
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate("Ticket")}
+      {/* Falling food */}
+      {animations.map((anim, i) => (
+        <Animated.Text
+          key={i}
+          style={[
+            styles.food,
+            { transform: [{ translateY: anim.y }, { translateX: anim.x }] },
+          ]}
         >
-          <Text style={styles.buttonText}>Receber Ticket</Text>
-        </TouchableOpacity>
-      )}
+          {FOODS[i]}
+        </Animated.Text>
+      ))}
+
+      {/* App Title */}
+      <Text style={styles.appTitle}>Prato Já!</Text>
+
+      {/* Subtitle */}
+      <Text style={styles.subtitle}>Escolha seu método de login</Text>
 
       <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("Intervalo")}
+        style={[styles.button, styles.adminButton]}
+        onPress={() => navigation.navigate("Login", { userType: "admin" })}
       >
-        <Text style={styles.buttonText}>Intervalo</Text>
+        <Text style={styles.buttonText}>Administrador</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("Localizacao")}
+        style={[styles.button, styles.alunoButton]}
+        onPress={() => navigation.navigate("Login", { userType: "aluno" })}
       >
-        <Text style={styles.buttonText}>Localização</Text>
+        <Text style={styles.buttonText}>Aluno</Text>
       </TouchableOpacity>
-
-      {userType === "admin" && (
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate("Adm")}
-        >
-          <Text style={styles.buttonText}>Painel Admin</Text>
-        </TouchableOpacity>
-      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", alignItems: "center", padding: 20 },
-  title: { fontSize: 26, fontWeight: "bold", marginBottom: 30 },
+  container: { 
+    flex: 1, 
+    justifyContent: "center", 
+    alignItems: "center", 
+    padding: 20,
+    backgroundColor: "#FFF8E7",
+  },
+  appTitle: { 
+    fontSize: 34, 
+    fontWeight: "900", 
+    marginBottom: 10, 
+    color: "#E63946",
+    textAlign: "center",
+  },
+  subtitle: { 
+    fontSize: 20, 
+    fontWeight: "600", 
+    marginBottom: 40, 
+    color: "#333",
+    textAlign: "center",
+  },
   button: {
-    backgroundColor: "#6200EE",
     paddingVertical: 15,
     paddingHorizontal: 25,
-    borderRadius: 10,
-    marginVertical: 10,
+    borderRadius: 12,
+    marginVertical: 12,
     width: "80%",
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.15,
+    shadowOffset: { width: 0, height: 3 },
+    shadowRadius: 6,
+    elevation: 4,
   },
-  buttonText: { color: "#fff", fontSize: 18, fontWeight: "bold" },
+  adminButton: {
+    backgroundColor: "#D62828",
+  },
+  alunoButton: {
+    backgroundColor: "#0077B6",
+  },
+  buttonText: { 
+    color: "#fff", 
+    fontSize: 18, 
+    fontWeight: "600" 
+  },
+  food: {
+    position: "absolute",
+    fontSize: 32,
+    opacity: 0.85,
+  },
 });
