@@ -4,94 +4,92 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "reac
 export default function LoginScreen({ navigation }) {
   const [matricula, setMatricula] = useState("");
   const [senha, setSenha] = useState("");
-  const [isAdmin, setIsAdmin] = useState(false);
   const [logado, setLogado] = useState(false);
 
   const handleLogin = () => {
-    if (isAdmin) {
-      if (senha === "1234") {
-        Alert.alert("Sucesso", "Bem-vindo, Administrador!");
-        setLogado(true);
-      } else {
-        Alert.alert("Erro", "Senha incorreta!");
+    // 🔑 Validação admin
+    if (matricula === "admin" && senha === "admin123") {
+      Alert.alert("Sucesso", "Bem-vindo administrador!");
+      setLogado(true);
+      navigation.navigate("AdmScreen"); // redireciona pra tela do admin
+    } 
+    // 🔑 Validação aluno
+    else {
+      if (!matricula.trim() || !senha.trim()) {
+        Alert.alert("Erro", "Digite sua matrícula e senha!");
+        return;
       }
-    } else {
-      if (matricula.trim() !== "") {
+
+      if (senha === "1234") { // senha padrão de aluno (pode trocar)
         Alert.alert("Sucesso", `Bem-vindo aluno ${matricula}`);
         setLogado(true);
+        navigation.navigate("HomeAluno"); // redireciona pra tela do aluno
       } else {
-        Alert.alert("Erro", "Digite sua matrícula!");
+        Alert.alert("Erro", "Senha incorreta!");
       }
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Seja bem-vindo</Text>
+      <Text style={styles.title}>Login</Text>
 
-      {isAdmin ? (
-        <TextInput
-          style={styles.input}
-          placeholder="Senha do administrador"
-          secureTextEntry
-          value={senha}
-          onChangeText={setSenha}
-        />
-      ) : (
-        <TextInput
-          style={styles.input}
-          placeholder="Matrícula do aluno"
-          value={matricula}
-          onChangeText={setMatricula}
-        />
-      )}
+      <TextInput
+        style={styles.input}
+        placeholder="Digite sua matrícula"
+        value={matricula}
+        onChangeText={setMatricula}
+      />
+
+      <TextInput
+        style={styles.input}
+        placeholder="Digite sua senha"
+        secureTextEntry
+        value={senha}
+        onChangeText={setSenha}
+      />
 
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Entrar</Text>
       </TouchableOpacity>
-
-      <TouchableOpacity onPress={() => setIsAdmin(!isAdmin)}>
-        <Text style={styles.toggle}>
-          {isAdmin ? "Entrar como Aluno" : "Entrar como Administrador"}
-        </Text>
-      </TouchableOpacity>
-
-      {/* Botões só aparecem se logado */}
-      {logado && !isAdmin && (
-        <TouchableOpacity
-          style={[styles.button, { marginTop: 20, backgroundColor: "#9c51bdff" }]}
-          onPress={() => navigation.navigate("Ticket", { matricula })}
-        >
-          <Text style={styles.buttonText}>Ir para Receber Ticket</Text>
-        </TouchableOpacity>
-      )}
-
-      {logado && isAdmin && (
-        <>
-          <TouchableOpacity
-            style={[styles.button, { marginTop: 20, backgroundColor: "#4CAF50" }]}
-            onPress={() => navigation.navigate("Adm")}
-          >
-            <Text style={styles.buttonText}>Ir para Painel ADM</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.button, { marginTop: 20, backgroundColor: "#3f51b5" }]}
-            onPress={() => navigation.navigate("Validacao")}
-          >
-            <Text style={styles.buttonText}>Ir para Validação de Tickets</Text>
-          </TouchableOpacity>
-        </>
-      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", padding: 20, backgroundColor: "#f5f5f5" },
-  title: { fontSize: 26, fontWeight: "bold", textAlign: "center", marginBottom: 20 },
-  input: { backgroundColor: "#fff", padding: 12, borderRadius: 8, borderWidth: 1, borderColor: "#ccc", marginBottom: 12 },
-  button: { backgroundColor: "#7ccf7fff", padding: 15, borderRadius: 8, alignItems: "center" },
-  buttonText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
-  toggle: { marginTop: 15, textAlign: "center", color: "#007BFF", fontWeight: "600" },
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f5f5f5",
+    padding: 20,
+  },
+  title: {
+    fontSize: 26,
+    fontWeight: "bold",
+    marginBottom: 30,
+  },
+  input: {
+    width: "100%",
+    height: 50,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    marginBottom: 15,
+    backgroundColor: "#fff",
+  },
+  button: {
+    width: "100%",
+    height: 50,
+    backgroundColor: "#007AFF",
+    borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
 });
