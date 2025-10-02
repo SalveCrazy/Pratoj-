@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage"; // Importado
+import AsyncStorage from "@react-native-async-storage/async-storage"; 
 
 export default function LoginScreen({ navigation, route }) {
   const [matricula, setMatricula] = useState("");
   const [senha, setSenha] = useState("");
-  const userType = route.params?.userType; // Pega o tipo de usuário passado pela HomeScreen
+  const userType = route.params?.userType; 
 
   const handleLogin = async () => {
     if (!matricula.trim() || !senha.trim()) {
@@ -13,27 +13,27 @@ export default function LoginScreen({ navigation, route }) {
       return;
     }
 
-    // Login ADM
+    
     if (userType === "admin" && matricula === "adm" && senha === "123") {
       navigation.navigate("AdmScreen");
       return;
     }
 
-    // Login Atendente (para Validar Ticket)
-    if (userType === "atendente" && matricula === "valida" && senha === "999") { // Novo login de atendente
+    
+    if (userType === "atendente" && matricula === "valida" && senha === "999") { 
       navigation.navigate("Validacao");
       return;
     }
     
-    // Login Aluno
+    
     if (userType === "aluno") {
       const alunosData = await AsyncStorage.getItem("alunos");
       const alunos = alunosData ? JSON.parse(alunosData) : [];
       const aluno = alunos.find(a => a.matricula === matricula);
 
-      if (aluno && senha === "1234") { // Usa senha padrão ou a que você definir
+      if (aluno && senha === "1234") {
         Alert.alert("Sucesso", `Bem-vindo(a), ${aluno.nome}!`);
-        // Navega para a HomeAluno, passando os dados do aluno para a próxima tela
+        
         navigation.navigate("HomeAluno", { aluno }); 
       } else if (aluno) {
         Alert.alert("Erro", "Senha incorreta!");
@@ -43,7 +43,7 @@ export default function LoginScreen({ navigation, route }) {
       return;
     }
     
-    // Caso caia aqui, deve ser um login vindo direto (pode ser ajustado)
+    
     Alert.alert("Erro", "Tipo de usuário não especificado ou credenciais incorretas.");
   };
 
@@ -74,7 +74,7 @@ export default function LoginScreen({ navigation, route }) {
 }
 
 const styles = StyleSheet.create({
-// ... Seus estilos permanecem os mesmos
+
   container: {
     flex: 1,
     justifyContent: "center",
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   buttonText: {
-    color: "#fff",
+    color: "#fff", 
     fontSize: 18,
     fontWeight: "bold",
   },
