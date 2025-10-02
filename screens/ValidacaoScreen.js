@@ -19,12 +19,12 @@ export default function ValidacaoScreen() {
         const tickets = ticketsData ? JSON.parse(ticketsData) : [];
         const hoje = getToday();
 
-        // 1. Encontra o ticket do aluno para hoje
+        
         const ticket = tickets.find(
             (t) => t.matricula === inputMatricula && t.date === hoje
         );
         
-        // 2. Busca o nome do aluno
+        
         const alunosData = await AsyncStorage.getItem("alunos");
         const alunos = alunosData ? JSON.parse(alunosData) : [];
         const aluno = alunos.find(a => a.matricula === inputMatricula);
@@ -47,7 +47,7 @@ export default function ValidacaoScreen() {
         const ticketsData = await AsyncStorage.getItem("tickets");
         let listaTickets = ticketsData ? JSON.parse(ticketsData) : [];
 
-        // Atualiza o ticket na lista como 'usado: true'
+        
         listaTickets = listaTickets.map(t => 
             t.matricula === ticketInfo.matricula && t.date === getToday()
                 ? { ...t, usado: true } 
@@ -56,12 +56,12 @@ export default function ValidacaoScreen() {
         
         await AsyncStorage.setItem("tickets", JSON.stringify(listaTickets));
         
-        // Atualiza o estado local
+        
         setTicketInfo(prev => ({ ...prev, usado: true }));
         Alert.alert("Sucesso", `Ticket de ${alunoNome} validado e marcado como USADO!`);
     };
     
-    // Status visual
+    
     const statusText = ticketInfo 
         ? (ticketInfo.usado ? "❌ USADO HOJE" : "✅ DISPONÍVEL") 
         : "Aguardando busca...";
