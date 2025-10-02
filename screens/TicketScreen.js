@@ -2,21 +2,21 @@ import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-// Função utilitária para pegar a data de hoje formatada
+
 const getToday = () => new Date().toLocaleDateString();
 
 export default function TicketScreen({ route }) {
-  const { matricula } = route.params || {}; // Recebe a matrícula do aluno
+  const { matricula } = route.params || {};
   const [ticketStatus, setTicketStatus] = useState("Carregando...");
-  const [naEscola, setNaEscola] = useState(false); // Simulação de Localização
+  const [naEscola, setNaEscola] = useState(false); 
   const [podeReceber, setPodeReceber] = useState(false);
 
-  // Configuração do Intervalo
+  
   const horaIntervalo = 10;
   const minutoIntervalo = 0;
-  const minutosLimiteReceber = 5; // 5 minutos antes do intervalo
+  const minutosLimiteReceber = 5; 
 
-  // 1. Carrega o nome do aluno e verifica status do ticket
+  
   useEffect(() => {
     const checkTicketStatus = async () => {
       if (!matricula) return;
@@ -25,7 +25,7 @@ export default function TicketScreen({ route }) {
       const tickets = ticketsData ? JSON.parse(ticketsData) : [];
       const hoje = getToday();
 
-      // Busca o ticket do aluno para hoje
+      
       const ticketDoAluno = tickets.find(
         (t) => t.matricula === matricula && t.date === hoje
       );
@@ -42,12 +42,12 @@ export default function TicketScreen({ route }) {
     };
     
     checkTicketStatus();
-    // Monitora o estado de naEscola e hora para revalidar a permissão
+    
     const intervalId = setInterval(checkTicketStatus, 5000); 
     return () => clearInterval(intervalId);
   }, [matricula]);
 
-  // 2. Verifica Horário para Recebimento
+  
   useEffect(() => {
     const checkHorario = () => {
       const agora = new Date();
@@ -57,18 +57,18 @@ export default function TicketScreen({ route }) {
       const tempoTotalAtual = h * 60 + m;
       const tempoTotalIntervalo = horaIntervalo * 60 + minutoIntervalo;
       
-      // Diferença em minutos (negativo se já passou)
+      
       const diff = tempoTotalIntervalo - tempoTotalAtual; 
       
-      // Permitir receber ticket nos 5 minutos ANTES do intervalo
+     
       setPodeReceber(diff <= minutosLimiteReceber && diff > 0); 
     };
     checkHorario();
-    const timer = setInterval(checkHorario, 5000); // 5 segundos para mais precisão
+    const timer = setInterval(checkHorario, 5000); 
     return () => clearInterval(timer);
   }, []);
 
-  // 3. Recebimento do Ticket
+  
   const handleReceberTicket = async () => {
     if (!podeReceber) {
         Alert.alert("Erro", `Você só pode receber o ticket nos ${minutosLimiteReceber} minutos antes do intervalo (${horaIntervalo}:${minutoIntervalo.toString().padStart(2, '0')}).`);
@@ -84,7 +84,7 @@ export default function TicketScreen({ route }) {
     const ticketsData = await AsyncStorage.getItem("tickets");
     const listaTickets = ticketsData ? JSON.parse(ticketsData) : [];
 
-    // 1. Verifica se já recebeu
+    
     const jaRecebeu = listaTickets.some(
       (t) => t.matricula === matricula && t.date === hoje
     );
@@ -94,7 +94,7 @@ export default function TicketScreen({ route }) {
       return;
     }
 
-    // 2. Cria e Salva o novo ticket
+    
     const novoTicket = { 
         date: hoje, 
         matricula, 
