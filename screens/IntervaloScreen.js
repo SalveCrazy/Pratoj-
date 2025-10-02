@@ -1,4 +1,4 @@
-// screens/IntervaloScreen.js
+
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet } from "react-native";
 
@@ -6,10 +6,10 @@ export default function IntervaloScreen() {
   const [status, setStatus] = useState("");
   const [tempoRestante, setTempoRestante] = useState("");
 
-  // Define o horário do intervalo (exemplo: 10:00 até 10:15)
+  
   const horaInicio = 10;
   const minutoInicio = 0;
-  const duracao = 15; // minutos
+  const duracao = 15; 
 
   useEffect(() => {
     const verificarIntervalo = () => {
