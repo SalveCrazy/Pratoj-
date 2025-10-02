@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useFocusEffect } from '@react-navigation/native'; // Para recarregar os dados ao focar na tela
+import { useFocusEffect } from '@react-navigation/native';
 
 const getToday = () => new Date().toLocaleDateString();
 
@@ -16,7 +16,7 @@ export default function AdmScreen() {
         const ticketsSalvos = await AsyncStorage.getItem("tickets");
         if (alunosSalvos) setAlunos(JSON.parse(alunosSalvos));
         
-        // Filtra tickets apenas para o dia de hoje
+        
         if (ticketsSalvos) {
             const listaTickets = JSON.parse(ticketsSalvos);
             const ticketsDeHoje = listaTickets.filter(t => t.date === getToday());
@@ -24,7 +24,7 @@ export default function AdmScreen() {
         }
     }, []);
 
-    // Recarrega os dados sempre que a tela for focada
+    
     useFocusEffect(
         useCallback(() => {
             carregarDados();
@@ -48,7 +48,7 @@ export default function AdmScreen() {
     };
 
     const resetarTickets = async () => {
-        // Remove apenas os tickets de hoje para resetar o dia
+        
         const ticketsData = await AsyncStorage.getItem("tickets");
         const listaTickets = ticketsData ? JSON.parse(ticketsData) : [];
         const ticketsAnteriores = listaTickets.filter(t => t.date !== getToday());
@@ -58,7 +58,7 @@ export default function AdmScreen() {
         Alert.alert("Sucesso!", "Tickets de hoje foram resetados!");
     };
     
-    // NOVO: Renderiza um item de ticket com status detalhado
+    
     const renderTicketItem = ({ item }) => {
         const alunoInfo = alunos.find(a => a.matricula === item.matricula);
         const nomeAluno = alunoInfo ? alunoInfo.nome : 'Aluno não cadastrado';
