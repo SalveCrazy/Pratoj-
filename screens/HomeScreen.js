@@ -16,7 +16,7 @@ export default function HomeScreen({ navigation }) {
   useEffect(() => {
     animations.forEach((anim, index) => {
       const loop = () => {
-        // reset start position
+        
         anim.y.setValue(-100);
         anim.x.setValue(Math.random() * (width - 50));
 
@@ -27,7 +27,7 @@ export default function HomeScreen({ navigation }) {
         }).start(() => loop());
       };
 
-      // stagger start so they don't fall all at once
+      
       setTimeout(loop, index * 600);
     });
   }, []);
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
   alunoButton: {
     backgroundColor: "#0077B6",
   },
-  atendenteButton: { // Novo estilo para o atendente
+  atendenteButton: { 
     backgroundColor: "#6A0DAD", 
   },
   buttonText: { 
