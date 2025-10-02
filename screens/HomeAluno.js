@@ -1,9 +1,9 @@
-// screens/HomeAluno.js
+
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 
 export default function HomeAluno({ route, navigation }) {
-  // Recebe os dados do aluno passados na rota
+  
   const { aluno } = route.params;
 
   return (
@@ -13,7 +13,7 @@ export default function HomeAluno({ route, navigation }) {
 
       <TouchableOpacity
         style={[styles.button, { backgroundColor: "#007AFF" }]}
-        onPress={() => navigation.navigate("Ticket", { matricula: aluno.matricula })} // Passa a matrícula
+        onPress={() => navigation.navigate("Ticket", { matricula: aluno.matricula })} 
       >
         <Text style={styles.buttonText}>🎟️ Receber Ticket</Text>
       </TouchableOpacity>
@@ -35,7 +35,7 @@ export default function HomeAluno({ route, navigation }) {
 
       <TouchableOpacity
         style={[styles.button, { backgroundColor: "#D62828", marginTop: 40 }]}
-        onPress={() => navigation.navigate("HomeMenu")} // Volta para a tela de Menu Inicial
+        onPress={() => navigation.navigate("HomeMenu")}
       >
         <Text style={styles.buttonText}>Sair</Text>
       </TouchableOpacity>
